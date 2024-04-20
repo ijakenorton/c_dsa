@@ -1,4 +1,3 @@
-/* #include <cstdio> */
 #include "tree.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,24 +8,49 @@
 Node *make_node(int value, int root);
 void destructor(Node *node);
 void print_node(Node *node);
-void add(Tree *tree, int value);
-void walk(Node *current, Node *addition);
 
+void add_new_value(Tree *tree, int value);
+void add(Node *current, Node *addition);
+
+void walk_tree(Tree *root);
+void walk_nodes(Node *node);
+int leaf(Node *node);
+
+int leaf(Node *node) {
+  if (node->left == NULL && node->right == NULL)
+    return TRUE;
+  else
+    return !TRUE;
+}
 Tree *make_tree(int *arr, size_t len) {
   Tree *new_tree = malloc(sizeof(Tree));
   new_tree->root = make_node(arr[0], TRUE);
+
   for (size_t i = 1; i < len; i++) {
-    add(new_tree, arr[i]);
+    add_new_value(new_tree, arr[i]);
   }
   return new_tree;
 }
-
-void add(Tree *tree, int value) {
-  Node *new_node = make_node(value, !TRUE);
-  walk(tree->root, new_node);
+/* Walk tree from top to bottom */
+void walk_tree(Tree *tree) {
+  walk_nodes(tree->root);
+}
+void walk_nodes(Node *node) {
+  print_node(node);
+  if (node->left != NULL) {
+    walk_nodes(node->left);
+  }
+  if (node->right != NULL) {
+    walk_nodes(node->right);
+  }
 }
 
-void walk(Node *current, Node *new_node) {
+void add_new_value(Tree *tree, int value) {
+  Node *new_node = make_node(value, !TRUE);
+  add(tree->root, new_node);
+}
+
+void add(Node *current, Node *new_node) {
   if (current->value == new_node->value) {
     destructor(new_node);
     return;
@@ -34,16 +58,18 @@ void walk(Node *current, Node *new_node) {
   if (current->value > new_node->value) {
     if (current->left == NULL) {
       current->left = new_node;
+      new_node->parent = current;
       return;
     }
-    walk(new_node->left, current);
+    add(current->left, new_node);
   }
   if (current->value < new_node->value) {
     if (current->right == NULL) {
       current->right = new_node;
+      new_node->parent = current;
       return;
     }
-    walk(new_node->right, current);
+    add(current->right, new_node);
   }
 }
 
@@ -66,16 +92,13 @@ void destructor(Node *node) {
 }
 
 void print_node(Node *node) {
-  printf("Value: %d\nSize: %d\nHeight: %d\nRoot: %d\n", node->value, node->size,
-         node->height, node->root);
+    printf("Leaf: Value: %d\nSize: %d\nHeight: %d\nRoot: %d\nLeft: %p\nRight: "
+           "%p\n",
+           node->value, node->size, node->height, node->root, node->left , node->right);
 }
 
 int main() {
-  int arr[] = {0, 1, 2, 3, 4, 5};
-  Tree *tree = make_tree(arr, 6);
-
-  Node *node = make_node(9, !TRUE);
-
-  print_node(node);
-  destructor(node);
+  int arr[] = {5, 10, 3, 6, 9};
+  Tree *tree = make_tree(arr, 5);
+  walk_tree(tree);
 }
