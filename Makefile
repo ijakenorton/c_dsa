@@ -4,7 +4,7 @@ BIN_DIR = ./bin
 
 tree: 
 	mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -c tree.c -o $(BIN_DIR)/tree.o
+	$(CC) $(CFLAGS) -c tree.c list.c -o $(BIN_DIR)/tree.o
 	$(CC) -o $(BIN_DIR)/tree $(BIN_DIR)/tree.o
 
 list: 
@@ -18,9 +18,13 @@ run_tree: tree
 run_list: list
 	./bin/list
 
-# Clean target to remove build artifacts
+debug_tree: tree
+	valgrind ./bin/tree --track-origins=yes --leak-check=full
+
+debug_list: list
+	valgrind ./bin/list --track-origins=yes --leak-check=full
+
 clean:
 	rm -rf $(BIN_DIR)
 
-# A phony target to ensure make runs even if files named 'clean' exist
 .PHONY: clean $(BIN_DIR)

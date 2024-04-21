@@ -5,6 +5,7 @@
 ListHead *list_make_from_values(int *arr, size_t len);
 ListHead *list_make();
 ListNode *list_make_node(int value);
+void list_free(ListHead *head);
 void list_append(ListHead *list ,int value);
 void list_each(ListHead* head, FuncVoid f);
 ListHead *list_map(ListHead *head, FuncList f);
@@ -28,7 +29,7 @@ ListNode *list_make_node(int value){
   return new_node;
 }
 
-void list_append(ListHead *list ,int value){
+void list_append(ListNode *list ,int value){
   list->length += 1;
   if (list->head == NULL){
     list->head = list_make_node(value);
@@ -103,15 +104,15 @@ void head_destruct(ListHead *head){
 }
 
 
-int main(){
-  ListHead *list = list_make();
-  list_append(list, 0);
-  list_append(list, 1);
-  list_append(list, 2);
-  list_append(list, 9);
+/* int main(){ */
+/*   ListHead *list = list_make(); */
+/*   list_append(list, 0); */
+/*   list_append(list, 1); */
+/*   list_append(list, 2); */
+/*   list_append(list, 9); */
 
-  list_each(list, (FuncVoid)node_print);
-  list_free(list);
+/*   list_each(list, (FuncVoid)node_print); */
+/*   list_free(list); */
 
-    EXIT_SUCCESS;
-}
+/*     EXIT_SUCCESS; */
+/* } */

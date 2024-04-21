@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define TRUE 1
@@ -40,7 +41,7 @@ Tree *tree_make_from_values(int *arr, size_t len) {
 }
 /* Walk tree from top to bottom */
 void tree_walk(Tree *tree, int *arr) { walk_nodes(tree->root, arr, 0); }
-void walk_nodes(Node *node, int *arr, int i) {
+void walk_nodes(Node *node,  ) {
   arr[i] = node->value;
   if (node->left != NULL) {
     walk_nodes(node->left, arr, i);
