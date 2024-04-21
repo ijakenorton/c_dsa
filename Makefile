@@ -7,9 +7,16 @@ tree:
 	$(CC) $(CFLAGS) -c tree.c -o $(BIN_DIR)/tree.o
 	$(CC) -o $(BIN_DIR)/tree $(BIN_DIR)/tree.o
 
+list: 
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -c list.c -o $(BIN_DIR)/list.o
+	$(CC) -o $(BIN_DIR)/list $(BIN_DIR)/list.o
 
-run: tree
+run_tree: tree
 	./bin/tree
+
+run_list: list
+	./bin/list
 
 # Clean target to remove build artifacts
 clean:
