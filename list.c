@@ -2,83 +2,87 @@
 #include <stdio.h>
 #include <stdlib.h>
   
-ListHead *list_make_from_values(int *arr, size_t len);
-ListHead *list_make();
-ListNode *list_make_node(int value);
-void list_free(ListHead *head);
-void list_append(ListHead *list ,int value);
-void list_each(ListHead* head, FuncVoid f);
-ListHead *list_map(ListHead *head, FuncList f);
-void append(ListNode *node, int value);
+ListNode *list_make_from_array(int *arr, size_t len);
+ListNode *list_clone(ListNode *list);
+ListNode *list_make_node(void *value );
+void list_free(ListNode *head);
+void list_append(ListNode *list ,void *value);
+void list_each(ListNode* node, FuncVoid f);
+ListNode *list_map(ListNode *node, FuncList f);
+void append(ListNode *node, void *value);
 void free_nodes(ListNode *node);
 void node_destruct(ListNode *node);
-void head_destruct(ListHead *head);
 
-  
-ListHead *list_make(){
-  ListHead *new_list = malloc(sizeof(ListHead));
-  new_list->head = NULL;
-  new_list->length = 0;
-  return new_list;
-}
 
-ListNode *list_make_node(int value){
+
+ListNode *list_make_node(void *value){
   ListNode *new_node = malloc(sizeof(ListNode));
   new_node->value = value; 
   new_node->right = NULL;
+  new_node->length = 1;
   return new_node;
 }
 
-void list_append(ListNode *list ,int value){
-  list->length += 1;
-  if (list->head == NULL){
-    list->head = list_make_node(value);
-    return;
-  }
-  append(list->head, value);
+ListNode *list_make(){
+  ListNode *new_node = malloc(sizeof(ListNode));
+  new_node->right = NULL;
+  new_node->value = NULL;
+  new_node->length = 0;
+  return new_node;
 }
 
-void append(ListNode *node, int value){
+void list_append(ListNode *list ,void *value){
+  list->length += 1;
+  if (list->value == NULL) {
+    list->value = value;
+    return;
+  }
+  append(list, value);
+}
+
+void append(ListNode *node, void *value){
   if (node->right == NULL) {
     node->right = list_make_node(value);
     return;
   }
+
   append(node->right, value);
 }
 
-void list_each(ListHead *head, FuncVoid f){
-  if (head->head == NULL){
+void list_each(ListNode *head, FuncVoid f){
+  if (head == NULL){
     return ;
   }
-  ListNode *first = head->head;
-    for (ListNode* current = first; current != NULL; current = current->right) {
+    for (ListNode* current = head; current != NULL; current = current->right) {
         f(current);  
     }
 }
 
-ListHead *list_map(ListHead *head, FuncList f){
-  ListHead *new = list_make();
-  if (head->head == NULL){
-    return new;
-  }
-  ListNode *first = head->head;
-    for (ListNode* current = first; current != NULL; current = current->right) {
+ListNode *list_clone(ListNode *head){
+  ListNode *new = list_make();
+    for (ListNode* current = head; current != NULL; current = current->right) {
+      list_append(new, current->value);  
+    }
+  return new;
+}
+
+ListNode *list_map(ListNode *head, FuncList f){
+  ListNode *new = list_make();
+    for (ListNode* current = head; current != NULL; current = current->right) {
         list_append(new, f(current));  
     }
   return new;
 }
 
-void list_free(ListHead *head){
-  ListNode *node = head->head;
+void list_free(ListNode *head){
+  ListNode *node = head;
 
   if (node == NULL){
     node_destruct(node);
-    head_destruct(head);
     return;
   }
 
   free_nodes(node);
-  head_destruct(head);
 }
 
 void free_nodes(ListNode *node){
@@ -89,8 +93,8 @@ void free_nodes(ListNode *node){
   node_destruct(node);
 }
 
-void node_print(ListNode *node){
-  printf("%d\n", node->value);
+void node_print_int(ListNode *node){
+  printf("%d\n",*(int*)node->value);
 }
 
 void node_destruct(ListNode *node){
@@ -98,21 +102,30 @@ void node_destruct(ListNode *node){
   node = NULL;
 }
 
-void head_destruct(ListHead *head){
-  free(head);
-  head = NULL;
+
+
+int main(){
+  ListNode *list = list_make();
+  int* zero = malloc(sizeof(int));
+  int* one = malloc(sizeof(int));
+  int* two = malloc(sizeof(int));
+  int* three = malloc(sizeof(int));
+  *zero = 0 ;
+  *one = 1 ;
+  *two = 2 ;
+  *three = 3 ;
+
+  list_append(list, zero);
+  list_append(list, one);
+  list_append(list, two);
+  list_append(list, three);
+
+  list_each(list, (FuncVoid)node_print_int);
+  list_free(list);
+  free(zero);
+  free(one);
+  free(two);
+  free(three);
+
+    EXIT_SUCCESS;
 }
-
-
-/* int main(){ */
-/*   ListHead *list = list_make(); */
-/*   list_append(list, 0); */
-/*   list_append(list, 1); */
-/*   list_append(list, 2); */
-/*   list_append(list, 9); */
-
-/*   list_each(list, (FuncVoid)node_print); */
-/*   list_free(list); */
-
-/*     EXIT_SUCCESS; */
-/* } */
