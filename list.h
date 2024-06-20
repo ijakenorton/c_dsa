@@ -5,6 +5,7 @@
 
 typedef struct ListNode {
   void *value;
+  size_t ptr_size;
   size_t length;
   struct ListNode *right;
 } ListNode;
