@@ -4,7 +4,7 @@
 
 ListNode *list_make_from_array(int *arr, size_t len);
 ListNode *list_clone(ListNode *list, FuncList f);
-ListNode *list_make_node(void *value, size_t ptr_size);
+ListNode *list_make_node(void *value);
 void list_free(ListNode *head);
 void list_append(ListNode *list, void *value);
 void list_each(ListNode *node, FuncVoid f);
@@ -13,16 +13,15 @@ void append(ListNode *node, void *value);
 void free_nodes(ListNode *node);
 void node_destruct(ListNode *node);
 
-ListNode *list_make_node(void *value, size_t ptr_size) {
+ListNode *list_make_node(void *value) {
   ListNode *new_node = malloc(sizeof(ListNode));
   new_node->value = value;
   new_node->right = NULL;
   new_node->length = 1;
-  new_node->ptr_size = ptr_size;
   return new_node;
 }
 
-ListNode *list_make(size_t ptr_size) {
+ListNode *list_make() {
   ListNode *new_node = malloc(sizeof(ListNode));
   new_node->right = NULL;
   new_node->value = NULL;
@@ -41,7 +40,7 @@ void list_append(ListNode *list, void *value) {
 
 void append(ListNode *node, void *value) {
   if (node->right == NULL) {
-    node->right = list_make_node(value, node->ptr_size);
+    node->right = list_make_node(value);
     return;
   }
 
@@ -58,7 +57,7 @@ void list_each(ListNode *head, FuncVoid f) {
 }
 
 ListNode *list_clone(ListNode *head, FuncList f) {
-  ListNode *new = list_make(head->ptr_size);
+  ListNode *new = list_make();
   for (ListNode *current = head; current != NULL; current = current->right) {
     list_append(new, f(current));
   }
@@ -66,7 +65,7 @@ ListNode *list_clone(ListNode *head, FuncList f) {
 }
 
 ListNode *list_map(ListNode *head, FuncList f) {
-  ListNode *new = list_make(head->ptr_size);
+  ListNode *new = list_make();
   for (ListNode *current = head; current != NULL; current = current->right) {
     list_append(new, f(current));
   }
@@ -106,7 +105,7 @@ void node_destruct(ListNode *node) {
 }
 
 int main() {
-  ListNode *list = list_make(sizeof(int));
+  ListNode *list = list_make();
   int *zero = malloc(sizeof(int));
   int *one = malloc(sizeof(int));
   int *two = malloc(sizeof(int));
@@ -122,15 +121,18 @@ int main() {
   list_append(list, three);
 
   list_each(list, (FuncVoid)node_print_int);
+  printf("\n");
   ListNode *cloned = list_clone(list, (FuncList)clone);
   list_append(list, three);
   list_each(list, (FuncVoid)node_print_int);
+  printf("\n");
   list_each(cloned, (FuncVoid)node_print_int);
+  printf("\n");
   list_free(list);
   free(zero);
   free(one);
   free(two);
   free(three);
 
-  EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
