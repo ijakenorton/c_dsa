@@ -12,17 +12,28 @@ list:
 	$(CC) $(CFLAGS) -c list.c -o $(BIN_DIR)/list.o
 	$(CC) -o $(BIN_DIR)/list $(BIN_DIR)/list.o
 
+queue: 
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -c queue.c -o $(BIN_DIR)/queue.o
+	$(CC) -o $(BIN_DIR)/queue $(BIN_DIR)/queue.o
+
 run_tree: tree
 	./bin/tree
 
 run_list: list
 	./bin/list
 
+run_queue: queue
+	./bin/queue
+
 debug_tree: tree
 	valgrind ./bin/tree --track-origins=yes --leak-check=full
 
 debug_list: list
 	valgrind ./bin/list --track-origins=yes --leak-check=full
+
+debug_queue: queue
+	valgrind ./bin/queue --track-origins=yes --leak-check=full
 
 clean:
 	rm -rf $(BIN_DIR)

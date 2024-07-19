@@ -8,10 +8,10 @@ ListNode *list_make_node(void *value);
 void list_free(ListNode *head);
 void list_append(ListNode *list, void *value);
 void list_each(ListNode *node, FuncVoid f);
-ListNode *list_map(ListNode *node, FuncList f);
+ListNode *list_inplace_map(ListNode *node, FuncList f);
 void append(ListNode *node, void *value);
 void free_nodes(ListNode *node);
-void node_destruct(ListNode *node);
+void free_node(ListNode *node);
 
 ListNode *list_make_node(void *value) {
   ListNode *new_node = malloc(sizeof(ListNode));
@@ -64,7 +64,7 @@ ListNode *list_clone(ListNode *head, FuncList f) {
   return new;
 }
 
-ListNode *list_map(ListNode *head, FuncList f) {
+ListNode *list_inplace_map(ListNode *head, FuncList f) {
   ListNode *new = list_make();
   for (ListNode *current = head; current != NULL; current = current->right) {
     list_append(new, f(current));
@@ -76,7 +76,7 @@ void list_free(ListNode *head) {
   ListNode *node = head;
 
   if (node == NULL) {
-    node_destruct(node);
+    free_node(node);
     return;
   }
 
@@ -88,7 +88,7 @@ void free_nodes(ListNode *node) {
     return;
   }
   free_nodes(node->right);
-  node_destruct(node);
+  free_node(node);
 }
 
 void node_print_int(ListNode *node) { printf("%d\n", *(int *)node->value); }
@@ -99,40 +99,28 @@ void *clone(ListNode *node) {
   return value;
 }
 
-void node_destruct(ListNode *node) {
+void free_node(ListNode *node) {
   free(node);
   node = NULL;
 }
 
 int main() {
   ListNode *list = list_make();
-  int *zero = malloc(sizeof(int));
-  int *one = malloc(sizeof(int));
-  int *two = malloc(sizeof(int));
-  int *three = malloc(sizeof(int));
-  *zero = 0;
-  *one = 1;
-  *two = 2;
-  *three = 3;
 
-  list_append(list, zero);
-  list_append(list, one);
-  list_append(list, two);
-  list_append(list, three);
+  int zero = 0;
+  int one = 1;
+  int two = 2;
+  int three = 3;
+  list_append(list, &zero);
+  list_append(list, &one);
+  list_append(list, &two);
+  list_append(list, &three);
 
   list_each(list, (FuncVoid)node_print_int);
   printf("\n");
-  ListNode *cloned = list_clone(list, (FuncList)clone);
-  list_append(list, three);
+  list_append(list, &three);
   list_each(list, (FuncVoid)node_print_int);
-  printf("\n");
-  list_each(cloned, (FuncVoid)node_print_int);
-  printf("\n");
   list_free(list);
-  free(zero);
-  free(one);
-  free(two);
-  free(three);
 
   return EXIT_SUCCESS;
 }
