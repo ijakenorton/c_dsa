@@ -24,6 +24,7 @@ QueueHead *queue_make() {
   new_queue->head = NULL;
   new_queue->tail = NULL;
   new_queue->length = 0;
+  new_queue->empty = 1;
   return new_queue;
 }
 
@@ -32,6 +33,7 @@ void queue_add(QueueHead *queue, void *value) {
   QueueNode *node = queue_make_node(value);
   if (queue->head == NULL) {
     queue->head = node;
+    queue->empty = 0;
     return;
   }
   if (queue->tail == NULL) {
@@ -47,20 +49,39 @@ void queue_add(QueueHead *queue, void *value) {
   return;
 }
 
+void *queue_peek(QueueHead *queue) {
+  if (queue->empty) {
+    return NULL;
+  }
+  return queue->head->value;
+}
+
+void *queue_poll(QueueHead *queue) {
+  if (queue->empty) {
+    return NULL;
+  }
+  void *value = queue->head->value;
+  QueueNode *head = queue->head->prev;
+  free_node(queue->head);
+  queue->head = head;
+  queue->head->next = NULL;
+  return value;
+}
+
 void queue_each(QueueHead *queue, FuncVoidQueue f) {
   if (queue == NULL) {
     return;
   }
-  for (QueueNode *current = queue->tail; current != NULL;
-       current = current->next) {
+  for (QueueNode *current = queue->head; current != NULL;
+       current = current->prev) {
     f(current);
   }
 }
 
 QueueHead *queue_inplace_map(QueueHead *queue, FuncQueue f) {
   QueueHead *new = queue_make();
-  for (QueueNode *current = queue->tail; current != NULL;
-       current = current->next) {
+  for (QueueNode *current = queue->head; current != NULL;
+       current = current->prev) {
     queue_add(new, f(current));
   }
   return new;
@@ -107,10 +128,17 @@ int main() {
   queue_add(queue, &one);
   queue_add(queue, &two);
   queue_add(queue, &three);
-
   queue_each(queue, (FuncVoidQueue)node_print_int);
   printf("\n");
-  queue_add(queue, &three);
+
+  int popped = *(int *)queue_peek(queue);
+
+  printf("peeked %d\n", popped);
+  queue_each(queue, (FuncVoidQueue)node_print_int);
+
+  printf("popped %d\n", *(int *)queue_poll(queue));
+  queue_each(queue, (FuncVoidQueue)node_print_int);
+  printf("popped %d\n", *(int *)queue_poll(queue));
   queue_each(queue, (FuncVoidQueue)node_print_int);
   queue_free(queue);
 
